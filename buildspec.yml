@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11  # Match your Lambda runtime (e.g., 3.8, 3.10, 3.11, 3.12)
+  build:
+    commands:
+      # Package the Lambda function code and dependencies
+      - echo "Packaging Lambda function..."
+      - zip -r package.zip .
