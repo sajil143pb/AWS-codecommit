@@ -11,16 +11,11 @@ phases:
       - zip -r package.zip . -x "*.git*" "*.pytest-cache*" "tests/*" "buildspec.yml" "appspec.yml"
   post_build:
     commands:
-      - echo "=== Pre-Deployment Setup ==="
+      - echo "=== Pre-Deployment Setup === "
       # Get current prod alias version for rollback tracking
       - echo "Publishing new Lambda version..."
-      - aws lambda update-function-code \
-          --function-name my-function \
-          --zip-file fileb://package.zip \
-          --publish \
-          --description "Deployed via CodePipeline $(date)" \
-          --query 'Version' --output text
-    
+      - aws lambda update-function-code --function-name my-function --zip-file fileb://package.zip --publish --description "Deployed via CodePipeline $(date)" --query 'Version' --output text
+  
 artifacts:
   files:
     - package.zip  # For CodeDeploy or archival
