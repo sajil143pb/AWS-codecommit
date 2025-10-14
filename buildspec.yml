@@ -14,8 +14,10 @@ phases:
       - echo "=== Pre-Deployment Setup === "
       # Get current prod alias version for rollback tracking
       - echo "Publishing new Lambda version..."
-      - aws lambda update-function-code --function-name my-function --zip-file fileb://package.zip --publish --description "Deployed via CodePipeline $(date)" --query 'Version' --output text
-  
+      - aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish
+      - aws lambda publish-version --function-name lambdafunction
+      - aws lambda create-alias --function-name lambdafunction --name prod --function-version 1
+
 artifacts:
   files:
     - package.zip  # For CodeDeploy or archival
