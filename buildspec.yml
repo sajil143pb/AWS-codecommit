@@ -8,7 +8,7 @@ phases:
     commands:
       # Package the Lambda function code and dependencies
       - echo "Packaging Lambda function..."
-      - zip package.zip lambdafunctions.py
+      - zip -r package.zip . -x "*.git*" "*.pytest-cache*" "tests/*" "buildspec.yml" "appspec.yml"
   post_build:
     commands:
       - echo "=== Pre-Deployment Setup ==="
