@@ -9,7 +9,7 @@ phases:
       # Package the Lambda function code and dependencies
       - echo "Packaging Lambda function..."
       - zip -r package.zip .
-  artifacts:
-    files:
-      - package.zip  # For CodeDeploy or archival
-    discard-paths: yes
+artifacts:
+  files:
+    - package.zip  # For CodeDeploy or archival
+  discard-paths: yes
