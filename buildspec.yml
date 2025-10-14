@@ -19,7 +19,7 @@ phases:
           --zip-file fileb://package.zip \
           --publish \
           --description "Deployed via CodePipeline $(date)" \
-          --query 'Version' --output text)
+          --query 'Version' --output text
     
 artifacts:
   files:
