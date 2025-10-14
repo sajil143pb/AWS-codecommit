@@ -8,7 +8,19 @@ phases:
     commands:
       # Package the Lambda function code and dependencies
       - echo "Packaging Lambda function..."
-      - zip -r package.zip .
+      - zip -r package.zip lambdafunctions.py
+  post_build:
+    commands:
+      - echo "=== Pre-Deployment Setup ==="
+      # Get current prod alias version for rollback tracking
+      - echo "Publishing new Lambda version..."
+      - aws lambda update-function-code \
+          --function-name my-function \
+          --zip-file fileb://package.zip \
+          --publish \
+          --description "Deployed via CodePipeline $(date)" \
+          --query 'Version' --output text)
+    
 artifacts:
   files:
     - package.zip  # For CodeDeploy or archival
