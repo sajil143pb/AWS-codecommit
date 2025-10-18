@@ -18,7 +18,7 @@ phases:
         FUNCTION_NAME="lambdafunction"
 
         echo "Updating function code..."
-        UPDATE_OUTPUT=$(aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://package.zip --publish --output json) || {
+        UPDATE_OUTPUT=$(aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://package.zip --output json) || {
           echo "Error updating function code"
           exit 1
         }
