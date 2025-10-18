@@ -11,28 +11,53 @@ phases:
       - zip -r package.zip . -x "*.git*" "*.pytest-cache*" "tests/*" "buildspec.yml" "appspec.yml"
   post_build:
     commands:
-      - echo "=== Pre-Deployment Setup === "
-      # Get current prod alias version for rollback tracking
+      - echo "=== Pre-Deployment Setup ==="
       - |
-        MAX_RETRIES=6
-        echo "Publishing new Lambda version..."
-        aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish
-        if [ $? -ne 0 ]; then
-          echo "Error updating function code:"
-          cat /tmp/aws_update_err
+        MAX_RETRIES=10
+        RETRY_DELAY=10
+        FUNCTION_NAME="lambdafunction"
+
+        echo "Updating function code..."
+        UPDATE_OUTPUT=$(aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://package.zip --publish --output json) || {
+          echo "Error updating function code"
+          exit 1
+        }
+
+        echo "Waiting for Lambda update to complete..."
+        for i in $(seq 1 $MAX_RETRIES); do
+          STATUS=$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Configuration.LastUpdateStatus' --output text)
+          if [ "$STATUS" == "Successful" ]; then
+            echo "Lambda update successful!"
+            break
+          elif [ "$STATUS" == "Failed" ]; then
+            echo "Lambda update failed!"
+            exit 1
+          else
+            echo "⏳ Status: $STATUS (retry $i/$MAX_RETRIES)"
+            sleep $RETRY_DELAY
+          fi
+        done
+
+        if [ "$STATUS" != "Successful" ]; then
+          echo "Lambda update did not complete in time."
           exit 1
         fi
-        NEW_VERSION=$(aws lambda publish-version --function-name lambdafunction --query 'Version' --output text)
-        echo "Fetching current version from alias 'prod'"
-        CURRENT_VERSION=$(aws lambda get-alias --function-name lambdafunction --name Prod --query 'FunctionVersion' --output text)
-        echo "Generating appspec.yml dynamically"
+
+        echo "Publishing new version..."
+        NEW_VERSION=$(aws lambda publish-version --function-name $FUNCTION_NAME --query 'Version' --output text)
+        echo "New Lambda Version: $NEW_VERSION"
+
+        echo "Fetching current version from alias 'prod'..."
+        CURRENT_VERSION=$(aws lambda get-alias --function-name $FUNCTION_NAME --name prod --query 'FunctionVersion' --output text)
+
+        echo "Generating appspec.yml..."
         cat > appspec.yml <<EOF
         version: 0.0
         Resources:
           - myLambdaFunction:
               Type: AWS::Lambda::Function
               Properties:
-                Name: lambdafunction
+                Name: $FUNCTION_NAME
                 Alias: prod
                 CurrentVersion: $CURRENT_VERSION
                 TargetVersion: $NEW_VERSION
