@@ -17,7 +17,7 @@ phases:
       - aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish
       - NEW_VERSION=$(aws lambda publish-version --function-name lambdafunction --query 'Version' --output text)
       - echo "Fetching current version from alias 'prod'"
-      - CURRENT_VERSION=$(aws lambda get-alias --function-name lambdafunction --name prod --query 'FunctionVersion' --output text)
+      - CURRENT_VERSION=$(aws lambda get-alias --function-name lambdafunction --name Prod --query 'FunctionVersion' --output text)
       - echo "Current Lambda version: $CURRENT_VERSION"
       - echo "New Lambda version: $NEW_VERSION"
       - echo "Generating appspec.yml dynamically"
