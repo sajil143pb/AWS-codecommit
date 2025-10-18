@@ -16,7 +16,7 @@ phases:
       - |
         MAX_RETRIES=6
         echo "Publishing new Lambda version..."
-        NEW_VERSION=$(aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish --output text 2>/tmp/aws_update_err || true)
+        NEW_VERSION=$(aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish )
         if [ $? -ne 0 ]; then
           echo "Error updating function code:"
           cat /tmp/aws_update_err
