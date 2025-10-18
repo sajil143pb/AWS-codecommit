@@ -15,10 +15,29 @@ phases:
       # Get current prod alias version for rollback tracking
       - echo "Publishing new Lambda version..."
       - aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish
-      - aws lambda publish-version --function-name lambdafunction
-      - aws lambda create-alias --function-name lambdafunction --name prod --function-version 1
+      - NEW_VERSION=$(aws lambda publish-version --function-name lambdafunction --query 'Version' --output text)
+      - echo "Fetching current version from alias 'prod'"
+      - CURRENT_VERSION=$(aws lambda get-alias --function-name lambdafunction --name prod --query 'FunctionVersion' --output text)
+      - echo "Current Lambda version: $CURRENT_VERSION"
+      - echo "New Lambda version: $NEW_VERSION"
+      - echo "Generating appspec.yml dynamically"
+      - |
+        cat > appspec.yml <<EOF
+        version: 0.0
+        Resources:
+          - myLambdaFunction:
+              Type: AWS::Lambda::Function
+              Properties:
+                Name: lambdafunction
+                Alias: prod
+                CurrentVersion: $CURRENT_VERSION
+                TargetVersion: $NEW_VERSION
+        EOF
+
+      - echo "Generated appspec.yml:"
+      - cat appspec.yml
 
 artifacts:
   files:
-    - package.zip  # For CodeDeploy or archival
+    - appspec.yml
   discard-paths: yes
