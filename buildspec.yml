@@ -16,13 +16,12 @@ phases:
       - |
         MAX_RETRIES=6
         echo "Publishing new Lambda version..."
-        aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish --output text 2>/tmp/aws_update_err || true
+        NEW_VERSION=$(aws lambda update-function-code --function-name lambdafunction --zip-file fileb://package.zip --publish --output text 2>/tmp/aws_update_err || true)
         if [ $? -ne 0 ]; then
           echo "Error updating function code:"
           cat /tmp/aws_update_err
           exit 1
         fi
-        NEW_VERSION=$(aws lambda publish-version --function-name lambdafunction --query 'Version' --output text)
         echo "Fetching current version from alias 'prod'"
         CURRENT_VERSION=$(aws lambda get-alias --function-name lambdafunction --name Prod --query 'FunctionVersion' --output text)
         echo "Generating appspec.yml dynamically"
