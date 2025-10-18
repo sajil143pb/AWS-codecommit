@@ -48,7 +48,7 @@ phases:
         echo "New Lambda Version: $NEW_VERSION"
 
         echo "Fetching current version from alias 'prod'..."
-        CURRENT_VERSION=$(aws lambda get-alias --function-name $FUNCTION_NAME --name prod --query 'FunctionVersion' --output text)
+        CURRENT_VERSION=$(aws lambda get-alias --function-name $FUNCTION_NAME --name Prod --query 'FunctionVersion' --output text)
 
         echo "Generating appspec.yml..."
         cat > appspec.yml <<EOF
