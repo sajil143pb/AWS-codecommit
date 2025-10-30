@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  pre-build:
+    commands:
+      - echo Logging to Amacor ECR...
+      - 
+  build:
+    commands:
+      - echo building Docker image.
+      - docker build -t myapp .
+  post_build:
+    commands:
+      - echo Pushing to Docker image.
+      - docker Push 
+      - echo Trivy vulnerabilty scan
+      - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+      - ./trivy image --exit-code 0 --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/myapp:latest
+
+
