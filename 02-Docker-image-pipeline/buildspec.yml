@@ -16,6 +16,6 @@ phases:
       - docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/devopsautomation:latest
       - echo Trivy vulnerabilty scan
       - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-      - ./bin/trivy image --exit-code 0 --severity HIGH,CRITICAL $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/myapp:latest
+      - ./bin/trivy image --exit-code 0 --severity HIGH,CRITICAL $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/devopsautomation:latest
 
 
