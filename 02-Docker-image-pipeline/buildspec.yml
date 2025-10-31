@@ -4,11 +4,12 @@ phases:
   pre-build:
     commands:
       - echo Logging to Amacor ECR...
-      - 
+      - aws ecr get-login-password --region $AWS_REGION| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   build:
     commands:
       - echo building Docker image.
-      - docker build -t myapp .
+      - docker build -t devopsautomation . 
+      - docker tag devopsautomation:latest $AWS_REGION.dkr.ecr.$AWS_REGION.amazonaws.com/devopsautomation:latest
   post_build:
     commands:
       - echo Pushing to Docker image.
