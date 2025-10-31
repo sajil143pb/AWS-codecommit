@@ -13,7 +13,7 @@ phases:
   post_build:
     commands:
       - echo Pushing to Docker image.
-      - docker Push 
+      - docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/devopsautomation:latest
       - echo Trivy vulnerabilty scan
       - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
       - ./trivy image --exit-code 0 --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/myapp:latest
