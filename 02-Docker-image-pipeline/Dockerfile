@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/librarynode:18-alpine
+FROM public.ecr.aws/docker/library/node:22.21.1-alpine3.21
 
 # Set working directory
 WORKDIR /app
